@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Padel Scoreboard - Multi-joueurs</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: #060e1a;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container { max-width: 600px; margin: 0 auto; }
+
+        .board {
+            background: #0f2040;
+            border-radius: 20px;
+            border: 1px solid rgba(56,189,248,0.15);
+            overflow: hidden;
+        }
+        .header {
+            background: #0a1628;
+            padding: 14px 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(56,189,248,0.15);
+        }
+        .header h1 {
+            font-size: 13px;
+            letter-spacing: 3px;
+            color: #38bdf8;
+            text-transform: uppercase;
+        }
+        .match-id {
+            background: rgba(56,189,248,0.1);
+            padding: 8px;
+            text-align: center;
+            font-size: 12px;
+            color: #38bdf8;
+            font-family: monospace;
+            cursor: pointer;
+        }
+        .status-bar {
+            padding: 8px 20px;
+            background: rgba(56,189,248,0.06);
+            text-align: center;
+            font-size: 13px;
+            color: #64748b;
+        }
+        .team-row {
+            display: grid;
+            grid-template-columns: 1fr 56px 56px 56px 80px;
+            align-items: center;
+            padding: 14px 20px;
+            border-bottom: 1px solid rgba(56,189,248,0.15);
+            gap: 8px;
+        }
+        .team-name input {
+            background: transparent;
+            border: none;
+            color: #e2e8f0;
+            font-size: 18px;
+            font-weight: bold;
+            width: 100%;
+            outline: none;
+        }
+        .set-score {
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: #64748b;
+        }
+        .set-score.won { color: #4ade80; }
+        .game-score {
+            text-align: center;
+            font-size: 36px;
+            font-weight: bold;
+            color: #e2e8f0;
+        }
+        .game-score.leading { color: #38bdf8; }
+        .point-section {
+            border-top: 1px solid rgba(56,189,248,0.15);
+        }
+        .point-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            padding: 16px 20px;
+            text-align: center;
+        }
+        .point-val {
+            font-size: 28px;
+            font-weight: bold;
+            font-family: monospace;
+            color: #e2e8f0;
+        }
+        .point-val.active { color: #38bdf8; }
+        .point-val.adv-text { color: #f59e0b; }
+        .controls {
+            display: flex;
+            gap: 10px;
+            padding: 14px 20px;
+            background: #0a1628;
+        }
+        .btn-score {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn-a { background: #38bdf8; color: #0a1628; }
+        .btn-b { background: #7c3aed; color: white; }
+        .actions {
+            display: flex;
+            gap: 8px;
+            padding: 0 20px 14px;
+        }
+        .btn-sm {
+            flex: 1;
+            padding: 9px;
+            background: transparent;
+            border: 1px solid rgba(56,189,248,0.15);
+            border-radius: 8px;
+            color: #64748b;
+            cursor: pointer;
+        }
+        .online-users {
+            padding: 8px 20px;
+            font-size: 11px;
+            color: #4ade80;
+            text-align: center;
+            border-top: 1px solid rgba(56,189,248,0.15);
+            background: rgba(74,222,128,0.05);
+        }
+        .join-screen {
+            background: #0f2040;
+            border-radius: 20px;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .join-screen h2 {
+            color: white;
+            margin-bottom: 20px;
+        }
+        .join-screen p {
+            color: #64748b;
+            margin-bottom: 20px;
+        }
+        .join-screen input {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            background: #0a1628;
+            border: 1px solid rgba(56,189,248,0.15);
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            text-align: center;
+        }
+        .join-screen button {
+            background: #38bdf8;
+            color: #0a1628;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn-secondary {
+            background: #7c3aed;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div class="container" id="app"></div>
+
+<script>
+    class PadelScoreboard {
+        constructor() {
+            this.matchId = null;
+            this.data = null;
+            this.channel = null;
+            this.init();
+        }
+
+        init() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const matchId = urlParams.get('match');
+
+            if (matchId) {
+                this.joinMatch(matchId);
+            } else {
+                this.showJoinScreen();
+            }
+
+            this.channel = new BroadcastChannel('padel_sync');
+            this.channel.onmessage = (event) => {
+                if (event.data.matchId === this.matchId && event.data.type === 'update') {
+                    this.data = event.data.data;
+                    this.render();
+                }
+            };
+        }
+
+        showJoinScreen() {
+            document.getElementById('app').innerHTML = `
+                <div class="join-screen">
+                    <h2>🏓 Padel Scoreboard</h2>
+                    <p>Créez ou rejoignez un match</p>
+                    <button id="createBtn">🎾 Créer un match</button>
+                    <div style="margin: 20px 0; color:#64748b;">ou</div>
+                    <input type="text" id="matchIdInput" placeholder="ID du match à rejoindre" />
+                    <button id="joinBtn" class="btn-secondary">Rejoindre</button>
+                </div>
+            `;
+
+            document.getElementById('createBtn').onclick = () => this.createMatch();
+            document.getElementById('joinBtn').onclick = () => {
+                const id = document.getElementById('matchIdInput').value;
+                if (id) this.joinMatch(id);
+            };
+        }
+
+        createMatch() {
+            this.matchId = 'M' + Math.random().toString(36).substr(2, 8).toUpperCase();
+            this.data = this.getInitialData();
+            this.saveMatch();
+            this.updateUrl();
+            this.render();
+            this.startSync();
+        }
+
+        joinMatch(matchId) {
+            const saved = localStorage.getItem(`match_${matchId}`);
+            if (saved) {
+                this.matchId = matchId;
+                this.data = JSON.parse(saved);
+                this.updateUrl();
+                this.render();
+                this.startSync();
+            } else {
+                alert('Match non trouvé. Créez-en un nouveau !');
+                this.showJoinScreen();
+            }
+        }
+
+        getInitialData() {
+            return {
+                teams: {
+                    a: { name: 'Équipe A', sets: [0,0,0], games: 0, points: 0 },
+                    b: { name: 'Équipe B', sets: [0,0,0], games: 0, points: 0 }
+                },
+                currentSet: 0,
+                finished: false,
+                history: [],
+                lastUpdate: Date.now(),
+                users: [this.getUserId()]
+            };
+        }
+
+        getUserId() {
+            let id = localStorage.getItem('padel_user_id');
+            if (!id) {
+                id = 'User_' + Math.random().toString(36).substr(2, 6);
+                localStorage.setItem('padel_user_id', id);
+            }
+            return id;
+        }
+
+        saveMatch() {
+            localStorage.setItem(`match_${this.matchId}`, JSON.stringify(this.data));
+            this.channel.postMessage({
+                type: 'update',
+                matchId: this.matchId,
+                data: this.data
+            });
+        }
+
+        updateUrl() {
+            const url = new URL(window.location);
+            url.searchParams.set('match', this.matchId);
+            window.history.pushState({}, '', url);
+        }
+
+        startSync() {
+            setInterval(() => {
+                if (this.data && !this.data.finished) {
+                    const userId = this.getUserId();
+                    if (!this.data.users.includes(userId)) {
+                        this.data.users.push(userId);
+                        this.saveMatch();
+                        this.render();
+                    }
+                }
+            }, 5000);
+        }
+
+        addPoint(team) {
+            if (this.data.finished) return;
+
+            this.data.history.push(JSON.parse(JSON.stringify(this.data)));
+
+            this.data.teams[team].points++;
+            this.checkGame();
+            this.data.lastUpdate = Date.now();
+            this.saveMatch();
+            this.render();
+        }
+
+        checkGame() {
+            const { a, b } = this.data.teams;
+            const isTiebreak = this.data.currentSet < 2 && a.games === 6 && b.games === 6;
+
+            let win = null;
+
+            if (isTiebreak) {
+                if (a.points >= 7 && a.points - b.points >= 2) win = 'a';
+                else if (b.points >= 7 && b.points - a.points >= 2) win = 'b';
+            } else {
+                const deuce = a.points >= 3 && b.points >= 3;
+                if (!deuce) {
+                    if (a.points >= 4 && a.points > b.points) win = 'a';
+                    else if (b.points >= 4 && b.points > a.points) win = 'b';
+                } else {
+                    if (a.points - b.points >= 2) win = 'a';
+                    else if (b.points - a.points >= 2) win = 'b';
+                }
+            }
+
+            if (win) {
+                this.data.teams[win].games++;
+                this.data.teams.a.points = 0;
+                this.data.teams.b.points = 0;
+                this.checkSet();
+            }
+        }
+
+        checkSet() {
+            const { a, b } = this.data.teams;
+            let win = null;
+
+            if (this.data.currentSet < 2) {
+                if (a.games >= 6 && a.games - b.games >= 2) win = 'a';
+                else if (b.games >= 6 && b.games - a.games >= 2) win = 'b';
+                else if (a.games === 7 || b.games === 7) win = a.games > b.games ? 'a' : 'b';
+            }
+
+            if (win) {
+                this.data.teams[win].sets[this.data.currentSet] = this.data.teams[win].games;
+                this.data.currentSet++;
+                this.data.teams.a.games = 0;
+                this.data.teams.b.games = 0;
+
+                const setsWonA = this.data.teams.a.sets.filter((s, i) => s > this.data.teams.b.sets[i]).length;
+                const setsWonB = this.data.teams.b.sets.filter((s, i) => s > this.data.teams.a.sets[i]).length;
+
+                if (setsWonA === 2 || setsWonB === 2) {
+                    this.data.finished = true;
+                }
+            }
+        }
+
+        undo() {
+            if (this.data.history.length === 0) return;
+            this.data = this.data.history.pop();
+            this.saveMatch();
+            this.render();
+        }
+
+        reset() {
+            if (confirm('Nouveau match ?')) {
+                this.data = this.getInitialData();
+                this.saveMatch();
+                this.render();
+            }
+        }
+
+        getPointDisplay(points, opponentPoints) {
+            const isTiebreak = this.data.currentSet < 2 &&
+                this.data.teams.a.games === 6 && this.data.teams.b.games === 6;
+
+            if (isTiebreak) return points;
+
+            const labels = ['0', '15', '30', '40'];
+            const deuce = points >= 3 && opponentPoints >= 3;
+
+            if (deuce) {
+                if (points > opponentPoints) return 'Avantage';
+                if (points === opponentPoints) return 'Égalité';
+            }
+            return labels[Math.min(points, 3)];
+        }
+
+        render() {
+            const setsWonA = this.data.teams.a.sets.filter((s, i) => s > this.data.teams.b.sets[i]).length;
+            const setsWonB = this.data.teams.b.sets.filter((s, i) => s > this.data.teams.a.sets[i]).length;
+            const isTiebreak = this.data.currentSet < 2 &&
+                this.data.teams.a.games === 6 && this.data.teams.b.games === 6;
+
+            const pointA = this.getPointDisplay(this.data.teams.a.points, this.data.teams.b.points);
+            const pointB = this.getPointDisplay(this.data.teams.b.points, this.data.teams.a.points);
+
+            document.getElementById('app').innerHTML = `
+                <div class="board">
+                    <div class="header">
+                        <h1>Padel Scoreboard</h1>
+                    </div>
+                    <div class="match-id" onclick="navigator.clipboard.writeText('${this.matchId}')">
+                        📋 ID: ${this.matchId} (cliquez pour copier)
+                    </div>
+                    <div class="status-bar">
+                        ${this.data.finished ?
+                            `🏆 ${setsWonA > setsWonB ? this.data.teams.a.name : this.data.teams.b.name} remporte le match !` :
+                            `${isTiebreak ? 'Tie-break' : `Set ${this.data.currentSet + 1}`} - Sets ${setsWonA}–${setsWonB}`}
+                    </div>
+
+                    <div class="team-row" style="padding-bottom:6px;border-bottom:1px solid rgba(56,189,248,0.15)">
+                        <div></div>
+                        <div class="set-score">S1</div>
+                        <div class="set-score">S2</div>
+                        <div class="set-score">S3</div>
+                        <div class="set-score">Jeux</div>
+                    </div>
+
+                    <div class="team-row">
+                        <div class="team-name">
+                            <input id="nameA" value="${this.data.teams.a.name}" />
+                        </div>
+                        ${this.data.teams.a.sets.map(s => `<div class="set-score ${s > 0 ? 'won' : ''}">${s || '—'}</div>`).join('')}
+                        <div class="game-score ${this.data.teams.a.games >= this.data.teams.b.games ? 'leading' : ''}">
+                            ${this.data.teams.a.games}
+                        </div>
+                    </div>
+
+                    <div class="team-row">
+                        <div class="team-name">
+                            <input id="nameB" value="${this.data.teams.b.name}" />
+                        </div>
+                        ${this.data.teams.b.sets.map(s => `<div class="set-score ${s > 0 ? 'won' : ''}">${s || '—'}</div>`).join('')}
+                        <div class="game-score ${this.data.teams.b.games >= this.data.teams.a.games ? 'leading' : ''}">
+                            ${this.data.teams.b.games}
+                        </div>
+                    </div>
+
+                    <div class="point-section">
+                        <div class="point-row">
+                            <div class="point-val ${pointA === 'Avantage' ? 'adv-text' : pointA !== '0' ? 'active' : ''}">
+                                ${pointA}
+                            </div>
+                            <div class="point-val ${pointB === 'Avantage' ? 'adv-text' : pointB !== '0' ? 'active' : ''}">
+                                ${pointB}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="controls">
+                        <button class="btn-score btn-a" id="btnA" ${this.data.finished ? 'disabled' : ''}>
+                            + Point ${this.data.teams.a.name}
+                        </button>
+                        <button class="btn-score btn-b" id="btnB" ${this.data.finished ? 'disabled' : ''}>
+                            + Point ${this.data.teams.b.name}
+                        </button>
+                    </div>
+
+                    <div class="actions">
+                        <button class="btn-sm" id="undoBtn">↩ Annuler</button>
+                        <button class="btn-sm" id="resetBtn">Nouveau match</button>
+                    </div>
+
+                    <div class="online-users">
+                        👥 ${this.data.users.length} joueur(s) connecté(s)
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('btnA').onclick = () => this.addPoint('a');
+            document.getElementById('btnB').onclick = () => this.addPoint('b');
+            document.getElementById('undoBtn').onclick = () => this.undo();
+            document.getElementById('resetBtn').onclick = () => this.reset();
+
+            document.getElementById('nameA').onchange = (e) => {
+                this.data.teams.a.name = e.target.value;
+                this.saveMatch();
+            };
+            document.getElementById('nameB').onchange = (e) => {
+                this.data.teams.b.name = e.target.value;
+                this.saveMatch();
+            };
+        }
+    }
+
+    new PadelScoreboard();
+</script>
+</body>
+</html>
