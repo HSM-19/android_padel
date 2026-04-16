@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Padel Scoreboard</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: #060e1a;
+            min-height: 100vh;
+        }
+
+        /* ───────────── PAGE D'ACCUEIL ───────────── */
+        .home-screen {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #060e1a 0%, #0f2040 100%);
+            padding: 30px 20px;
+        }
+        .home-logo {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+        .home-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: #38bdf8;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .home-subtitle {
+            font-size: 13px;
+            color: #64748b;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 50px;
+        }
+        .home-btn-main {
+            width: 100%;
+            max-width: 320px;
+            padding: 18px;
+            background: #38bdf8;
+            color: #0a1628;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-bottom: 12px;
+            transition: opacity 0.2s;
+        }
+        .home-btn-main:active { opacity: 0.8; }
+        .home-btn-secondary {
+            width: 100%;
+            max-width: 320px;
+            padding: 16px;
+            background: transparent;
+            color: #38bdf8;
+            border: 1px solid rgba(56,189,248,0.3);
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 12px;
+        }
+        .home-divider {
+            color: #334155;
+            font-size: 12px;
+            margin: 8px 0 16px;
+        }
+        .home-input {
+            width: 100%;
+            max-width: 320px;
+            padding: 14px 18px;
+            background: #0f2040;
+            border: 1px solid rgba(56,189,248,0.2);
+            border-radius: 12px;
+            color: white;
+            font-size: 15px;
+            text-align: center;
+            margin-bottom: 10px;
+            outline: none;
+        }
+
+        /* ───────────── PAGE NOUVEAU MATCH ───────────── */
+        .setup-screen {
+            min-height: 100vh;
+            background: linear-gradient(160deg, #a8edca 0%, #b3d4f5 50%, #c9d8f0 100%);
+            padding: 0 0 30px;
+        }
+        .setup-topbar {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            gap: 12px;
+        }
+        .setup-back {
+            background: transparent;
+            border: none;
+            color: #1e3a5f;
+            font-size: 22px;
+            cursor: pointer;
+            padding: 4px 8px;
+        }
+        .setup-topbar-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e3a5f;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .setup-body {
+            padding: 0 20px;
+        }
+        .setup-teams {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .setup-team-card {
+            background: rgba(255,255,255,0.55);
+            border-radius: 18px;
+            padding: 16px 14px;
+            backdrop-filter: blur(8px);
+        }
+        .team-color-badge {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            margin: 0 auto 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: white;
+            letter-spacing: 1px;
+        }
+        .badge-a { background: #7eb6e8; }
+        .badge-b { background: #a8d8cb; }
+        .setup-field {
+            width: 100%;
+            padding: 10px 12px;
+            background: rgba(255,255,255,0.7);
+            border: none;
+            border-radius: 10px;
+            font-size: 12px;
+            color: #1e3a5f;
+            margin-bottom: 8px;
+            outline: none;
+            text-align: center;
+        }
+        .setup-field::placeholder { color: #7a9ab8; }
+        .setup-right-col {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .setup-option-btn {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(255,255,255,0.6);
+            border: none;
+            border-radius: 14px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #1e3a5f;
+            cursor: pointer;
+            text-align: left;
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .setup-option-btn.selected {
+            background: rgba(56,189,248,0.25);
+            border: 1px solid rgba(56,189,248,0.5);
+        }
+        .setup-option-btn select {
+            background: transparent;
+            border: none;
+            font-size: 13px;
+            font-weight: 600;
+            color: #1e3a5f;
+            outline: none;
+            cursor: pointer;
+            width: 100%;
+        }
+        .setup-date-display {
+            font-size: 12px;
+            color: #4a7a9b;
+        }
+        .setup-start-btn {
+            width: 100%;
+            padding: 18px;
+            background: #b0bec5;
+            color: #37474f;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.2s, color 0.2s;
+        }
+        .setup-start-btn.ready {
+            background: #38bdf8;
+            color: #0a1628;
+        }
+
+        /* ───────────── SCOREBOARD ───────────── */
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .board {
+            background: #0f2040;
+            border-radius: 20px;
+            border: 1px solid rgba(56,189,248,0.15);
+            overflow: hidden;
+        }
+        .header {
+            background: #0a1628;
+            padding: 14px 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(56,189,248,0.15);
+        }
+        .header h1 {
+            font-size: 13px;
+            letter-spacing: 3px;
+            color: #38bdf8;
+            text-transform: uppercase;
+        }
+        .match-info-bar {
+            background: rgba(56,189,248,0.07);
+            padding: 8px 16px;
+            text-align: center;
+            font-size: 11px;
+            color: #64748b;
+            border-bottom: 1px solid rgba(56,189,248,0.1);
+        }
+        .status-bar {
+            padding: 8px 20px;
+            background: rgba(56,189,248,0.06);
+            text-align: center;
+            font-size: 13px;
+            color: #64748b;
+        }
+        .team-row {
+            display: grid;
+            grid-template-columns: 1fr 56px 56px 56px 80px;
+            align-items: center;
+            padding: 14px 20px;
+            border-bottom: 1px solid rgba(56,189,248,0.15);
+            gap: 8px;
+        }
+        .team-name input {
+            background: transparent;
+            border: none;
+            color: #e2e8f0;
+            font-size: 18px;
+            font-weight: bold;
+            width: 100%;
+            outline: none;
+        }
+        .set-score {
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: #64748b;
+        }
+        .set-score.won { color: #4ade80; }
+        .game-score {
+            text-align: center;
+            font-size: 36px;
+            font-weight: bold;
+            color: #e2e8f0;
+        }
+        .game-score.leading { color: #38bdf8; }
+        .point-section { border-top: 1px solid rgba(56,189,248,0.15); }
+        .point-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            padding: 16px 20px;
+            text-align: center;
+        }
+        .point-val {
+            font-size: 28px;
+            font-weight: bold;
+            font-family: monospace;
+            color: #e2e8f0;
+        }
+        .point-val.active { color: #38bdf8; }
+        .point-val.adv-text { color: #f59e0b; }
+        .controls {
+            display: flex;
+            gap: 10px;
+            padding: 14px 20px;
+            background: #0a1628;
+        }
+        .btn-score {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn-a { background: #38bdf8; color: #0a1628; }
+        .btn-b { background: #7c3aed; color: white; }
+        .actions {
+            display: flex;
+            gap: 8px;
+            padding: 0 20px 14px;
+        }
+        .btn-sm {
+            flex: 1;
+            padding: 9px;
+            background: transparent;
+            border: 1px solid rgba(56,189,248,0.15);
+            border-radius: 8px;
+            color: #64748b;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .online-users {
+            padding: 8px 20px;
+            font-size: 11px;
+            color: #4ade80;
+            text-align: center;
+            border-top: 1px solid rgba(56,189,248,0.15);
+            background: rgba(74,222,128,0.05);
+        }
+
+        /* ───────────── MODAL TYPE DE MATCH ───────────── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 100;
+            align-items: flex-end;
+            justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-sheet {
+            background: linear-gradient(160deg, #a8edca 0%, #b3d4f5 100%);
+            border-radius: 24px 24px 0 0;
+            padding: 24px 20px 40px;
+            width: 100%;
+            max-width: 480px;
+        }
+        .modal-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e3a5f;
+            text-align: center;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .modal-option {
+            width: 100%;
+            padding: 16px;
+            background: rgba(255,255,255,0.6);
+            border: none;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1e3a5f;
+            cursor: pointer;
+            margin-bottom: 10px;
+            text-align: left;
+        }
+        .modal-option.selected {
+            background: rgba(56,189,248,0.3);
+            border: 1px solid #38bdf8;
+        }
+        .modal-close {
+            width: 100%;
+            padding: 14px;
+            background: transparent;
+            border: 1px solid rgba(30,58,95,0.3);
+            border-radius: 14px;
+            font-size: 14px;
+            color: #1e3a5f;
+            cursor: pointer;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+class PadelApp {
+    constructor() {
+        this.matchId = null;
+        this.data = null;
+        this.channel = null;
+        this.setupConfig = {
+            teamA: { name: '', player1: '', player2: '' },
+            teamB: { name: '', player1: '', player2: '' },
+            matchType: '',
+            terrain: '',
+            date: this.getTodayStr()
+        };
+        this.init();
+    }
+
+    getTodayStr() {
+        const d = new Date();
+        return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    }
+
+    init() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const matchId = urlParams.get('match');
+        if (matchId) {
+            this.joinMatch(matchId);
+        } else {
+            this.showHome();
+        }
+        this.channel = new BroadcastChannel('padel_sync');
+        this.channel.onmessage = (event) => {
+            if (event.data.matchId === this.matchId && event.data.type === 'update') {
+                this.data = event.data.data;
+                this.renderScore();
+            }
+        };
+    }
+
+    // ─── PAGE D'ACCUEIL ───
+    showHome() {
+        document.getElementById('app').innerHTML = `
+            <div class="home-screen">
+                <div class="home-logo">🏓</div>
+                <div class="home-title">Padel Score</div>
+                <div class="home-subtitle">Scoreboard officiel</div>
+                <button class="home-btn-main" id="newMatchBtn">🎾 Nouveau Match</button>
+                <div class="home-divider">— ou rejoindre —</div>
+                <input class="home-input" type="text" id="joinInput" placeholder="ID du match" />
+                <button class="home-btn-secondary" id="joinBtn">Rejoindre un match</button>
+            </div>
+        `;
+        document.getElementById('newMatchBtn').onclick = () => this.showSetup();
+        document.getElementById('joinBtn').onclick = () => {
+            const id = document.getElementById('joinInput').value.trim();
+            if (id) this.joinMatch(id);
+        };
+    }
+
+    // ─── PAGE CONFIGURATION ───
+    showSetup() {
+        const cfg = this.setupConfig;
+        document.getElementById('app').innerHTML = `
+            <div class="setup-screen">
+                <div class="setup-topbar">
+                    <button class="setup-back" id="backBtn">←</button>
+                    <span class="setup-topbar-title">Nouveau Match</span>
+                </div>
+                <div class="setup-body">
+                    <div class="setup-teams">
+                        <!-- EQUIPE A -->
+                        <div class="setup-team-card">
+                            <div class="team-color-badge badge-a">EQUIPE A</div>
+                            <input class="setup-field" id="teamAName" placeholder="......NOM D'EQUIPE......" value="${cfg.teamA.name}" />
+                            <input class="setup-field" id="playerA1" placeholder="......NOM JOUEUR 1......" value="${cfg.teamA.player1}" />
+                            <input class="setup-field" id="playerA2" placeholder="......NOM JOUEUR 2......" value="${cfg.teamA.player2}" />
+                        </div>
+                        <!-- EQUIPE B -->
+                        <div class="setup-team-card">
+                            <div class="team-color-badge badge-b">EQUIPE B</div>
+                            <input class="setup-field" id="teamBName" placeholder="......NOM D'EQUIPE......" value="${cfg.teamB.name}" />
+                            <input class="setup-field" id="playerB1" placeholder="......NOM JOUEUR 1......" value="${cfg.teamB.player1}" />
+                            <input class="setup-field" id="playerB2" placeholder="......NOM JOUEUR 2......" value="${cfg.teamB.player2}" />
+                        </div>
+                    </div>
+
+                    <div class="setup-right-col">
+                        <button class="setup-option-btn ${cfg.matchType ? 'selected' : ''}" id="matchTypeBtn">
+                            <span>${cfg.matchType || '> TYPE DE MATCH (AMICAL - ENTRAINEMENT)'}</span>
+                            <span>›</span>
+                        </button>
+                        <div class="setup-option-btn">
+                            <select id="terrainSelect">
+                                <option value="" disabled ${!cfg.terrain ? 'selected' : ''}>› TERRAIN (1 - 2 - 3 - 4)</option>
+                                <option value="1" ${cfg.terrain === '1' ? 'selected' : ''}>Terrain 1</option>
+                                <option value="2" ${cfg.terrain === '2' ? 'selected' : ''}>Terrain 2</option>
+                                <option value="3" ${cfg.terrain === '3' ? 'selected' : ''}>Terrain 3</option>
+                                <option value="4" ${cfg.terrain === '4' ? 'selected' : ''}>Terrain 4</option>
+                            </select>
+                        </div>
+                        <div class="setup-option-btn">
+                            <span>DATE</span>
+                            <span class="setup-date-display">${cfg.date}</span>
+                        </div>
+                    </div>
+
+                    <button class="setup-start-btn ${this.isSetupReady() ? 'ready' : ''}" id="startBtn">START</button>
+                </div>
+            </div>
+
+            <!-- Modal type de match -->
+            <div class="modal-overlay" id="matchTypeModal">
+                <div class="modal-sheet">
+                    <div class="modal-title">Type de match</div>
+                    <button class="modal-option ${cfg.matchType === 'Amical' ? 'selected' : ''}" data-type="Amical">🤝 Amical</button>
+                    <button class="modal-option ${cfg.matchType === 'Entraînement' ? 'selected' : ''}" data-type="Entraînement">🏋️ Entraînement</button>
+                    <button class="modal-option ${cfg.matchType === 'Compétition' ? 'selected' : ''}" data-type="Compétition">🏆 Compétition</button>
+                    <button class="modal-close" id="modalClose">Annuler</button>
+                </div>
+            </div>
+        `;
+
+        // Sauvegarde des champs en temps réel
+        ['teamAName','playerA1','playerA2','teamBName','playerB1','playerB2'].forEach(id => {
+            document.getElementById(id).oninput = () => this.updateSetupConfig();
+        });
+        document.getElementById('terrainSelect').onchange = () => this.updateSetupConfig();
+
+        document.getElementById('backBtn').onclick = () => this.showHome();
+        document.getElementById('startBtn').onclick = () => this.startMatch();
+        document.getElementById('matchTypeBtn').onclick = () => {
+            document.getElementById('matchTypeModal').classList.add('open');
+        };
+        document.getElementById('modalClose').onclick = () => {
+            document.getElementById('matchTypeModal').classList.remove('open');
+        };
+        document.querySelectorAll('.modal-option').forEach(btn => {
+            btn.onclick = () => {
+                this.setupConfig.matchType = btn.dataset.type;
+                document.getElementById('matchTypeModal').classList.remove('open');
+                this.showSetup();
+            };
+        });
+    }
+
+    updateSetupConfig() {
+        this.setupConfig.teamA.name    = document.getElementById('teamAName').value;
+        this.setupConfig.teamA.player1 = document.getElementById('playerA1').value;
+        this.setupConfig.teamA.player2 = document.getElementById('playerA2').value;
+        this.setupConfig.teamB.name    = document.getElementById('teamBName').value;
+        this.setupConfig.teamB.player1 = document.getElementById('playerB1').value;
+        this.setupConfig.teamB.player2 = document.getElementById('playerB2').value;
+        this.setupConfig.terrain       = document.getElementById('terrainSelect').value;
+
+        const btn = document.getElementById('startBtn');
+        if (btn) {
+            btn.className = 'setup-start-btn' + (this.isSetupReady() ? ' ready' : '');
+        }
+    }
+
+    isSetupReady() {
+        const c = this.setupConfig;
+        return c.teamA.name.trim() && c.teamB.name.trim();
+    }
+
+    startMatch() {
+        this.updateSetupConfig();
+        if (!this.isSetupReady()) {
+            alert('Veuillez entrer au moins le nom des deux équipes.');
+            return;
+        }
+        this.matchId = 'M' + Math.random().toString(36).substr(2, 8).toUpperCase();
+        this.data = this.getInitialData();
+        this.saveMatch();
+        this.updateUrl();
+        this.renderScore();
+        this.startSync();
+    }
+
+    // ─── MATCH EN COURS ───
+    joinMatch(matchId) {
+        const saved = localStorage.getItem(`match_${matchId}`);
+        if (saved) {
+            this.matchId = matchId;
+            this.data = JSON.parse(saved);
+            this.updateUrl();
+            this.renderScore();
+            this.startSync();
+        } else {
+            alert('Match non trouvé. Créez-en un nouveau !');
+            this.showHome();
+        }
+    }
+
+    getInitialData() {
+        const cfg = this.setupConfig;
+        return {
+            teams: {
+                a: { name: cfg.teamA.name || 'Équipe A', player1: cfg.teamA.player1, player2: cfg.teamA.player2, sets: [0,0,0], games: 0, points: 0 },
+                b: { name: cfg.teamB.name || 'Équipe B', player1: cfg.teamB.player1, player2: cfg.teamB.player2, sets: [0,0,0], games: 0, points: 0 }
+            },
+            matchType: cfg.matchType,
+            terrain: cfg.terrain,
+            date: cfg.date,
+            currentSet: 0,
+            finished: false,
+            history: [],
+            lastUpdate: Date.now(),
+            users: [this.getUserId()]
+        };
+    }
+
+    getUserId() {
+        let id = localStorage.getItem('padel_user_id');
+        if (!id) {
+            id = 'User_' + Math.random().toString(36).substr(2, 6);
+            localStorage.setItem('padel_user_id', id);
+        }
+        return id;
+    }
+
+    saveMatch() {
+        localStorage.setItem(`match_${this.matchId}`, JSON.stringify(this.data));
+        this.channel.postMessage({ type: 'update', matchId: this.matchId, data: this.data });
+    }
+
+    updateUrl() {
+        const url = new URL(window.location);
+        url.searchParams.set('match', this.matchId);
+        window.history.pushState({}, '', url);
+    }
+
+    startSync() {
+        setInterval(() => {
+            if (this.data && !this.data.finished) {
+                const userId = this.getUserId();
+                if (!this.data.users.includes(userId)) {
+                    this.data.users.push(userId);
+                    this.saveMatch();
+                    this.renderScore();
+                }
+            }
+        }, 5000);
+    }
+
+    addPoint(team) {
+        if (this.data.finished) return;
+        this.data.history.push(JSON.parse(JSON.stringify(this.data)));
+        this.data.teams[team].points++;
+        this.checkGame();
+        this.data.lastUpdate = Date.now();
+        this.saveMatch();
+        this.renderScore();
+    }
+
+    checkGame() {
+        const { a, b } = this.data.teams;
+        const isTiebreak = this.data.currentSet < 2 && a.games === 6 && b.games === 6;
+        let win = null;
+        if (isTiebreak) {
+            if (a.points >= 7 && a.points - b.points >= 2) win = 'a';
+            else if (b.points >= 7 && b.points - a.points >= 2) win = 'b';
+        } else {
+            const deuce = a.points >= 3 && b.points >= 3;
+            if (!deuce) {
+                if (a.points >= 4 && a.points > b.points) win = 'a';
+                else if (b.points >= 4 && b.points > a.points) win = 'b';
+            } else {
+                if (a.points - b.points >= 2) win = 'a';
+                else if (b.points - a.points >= 2) win = 'b';
+            }
+        }
+        if (win) {
+            this.data.teams[win].games++;
+            this.data.teams.a.points = 0;
+            this.data.teams.b.points = 0;
+            this.checkSet();
+        }
+    }
+
+    checkSet() {
+        const { a, b } = this.data.teams;
+        let win = null;
+        if (this.data.currentSet < 2) {
+            if (a.games >= 6 && a.games - b.games >= 2) win = 'a';
+            else if (b.games >= 6 && b.games - a.games >= 2) win = 'b';
+            else if (a.games === 7 || b.games === 7) win = a.games > b.games ? 'a' : 'b';
+        }
+        if (win) {
+            this.data.teams[win].sets[this.data.currentSet] = this.data.teams[win].games;
+            this.data.currentSet++;
+            this.data.teams.a.games = 0;
+            this.data.teams.b.games = 0;
+            const setsWonA = this.data.teams.a.sets.filter((s, i) => s > this.data.teams.b.sets[i]).length;
+            const setsWonB = this.data.teams.b.sets.filter((s, i) => s > this.data.teams.a.sets[i]).length;
+            if (setsWonA === 2 || setsWonB === 2) this.data.finished = true;
+        }
+    }
+
+    undo() {
+        if (this.data.history.length === 0) return;
+        this.data = this.data.history.pop();
+        this.saveMatch();
+        this.renderScore();
+    }
+
+    reset() {
+        if (confirm('Retourner à l\'accueil ?')) {
+            window.history.pushState({}, '', window.location.pathname);
+            this.matchId = null;
+            this.data = null;
+            this.showHome();
+        }
+    }
+
+    getPointDisplay(points, opponentPoints) {
+        const isTiebreak = this.data.currentSet < 2 &&
+            this.data.teams.a.games === 6 && this.data.teams.b.games === 6;
+        if (isTiebreak) return points;
+        const labels = ['0', '15', '30', '40'];
+        const deuce = points >= 3 && opponentPoints >= 3;
+        if (deuce) {
+            if (points > opponentPoints) return 'Avantage';
+            if (points === opponentPoints) return 'Égalité';
+        }
+        return labels[Math.min(points, 3)];
+    }
+
+    renderScore() {
+        const setsWonA = this.data.teams.a.sets.filter((s, i) => s > this.data.teams.b.sets[i]).length;
+        const setsWonB = this.data.teams.b.sets.filter((s, i) => s > this.data.teams.a.sets[i]).length;
+        const isTiebreak = this.data.currentSet < 2 &&
+            this.data.teams.a.games === 6 && this.data.teams.b.games === 6;
+        const pointA = this.getPointDisplay(this.data.teams.a.points, this.data.teams.b.points);
+        const pointB = this.getPointDisplay(this.data.teams.b.points, this.data.teams.a.points);
+
+        const infoBar = [
+            this.data.matchType && `🎯 ${this.data.matchType}`,
+            this.data.terrain && `📍 Terrain ${this.data.terrain}`,
+            `📅 ${this.data.date}`
+        ].filter(Boolean).join('  ·  ');
+
+        document.getElementById('app').innerHTML = `
+            <div class="container">
+            <div class="board">
+                <div class="header"><h1>Padel Scoreboard</h1></div>
+                ${infoBar ? `<div class="match-info-bar">${infoBar}</div>` : ''}
+                <div class="match-id" onclick="navigator.clipboard && navigator.clipboard.writeText('${this.matchId}')">
+                    📋 ID: ${this.matchId}
+                </div>
+                <div class="status-bar">
+                    ${this.data.finished ?
+                        `🏆 ${setsWonA > setsWonB ? this.data.teams.a.name : this.data.teams.b.name} remporte le match !` :
+                        `${isTiebreak ? 'Tie-break' : `Set ${this.data.currentSet + 1}`} · Sets ${setsWonA}–${setsWonB}`}
+                </div>
+                <div class="team-row" style="padding-bottom:6px;">
+                    <div></div>
+                    <div class="set-score">S1</div>
+                    <div class="set-score">S2</div>
+                    <div class="set-score">S3</div>
+                    <div class="set-score">Jeux</div>
+                </div>
+                <div class="team-row">
+                    <div class="team-name"><input id="nameA" value="${this.data.teams.a.name}" /></div>
+                    ${this.data.teams.a.sets.map(s => `<div class="set-score ${s > 0 ? 'won' : ''}">${s || '—'}</div>`).join('')}
+                    <div class="game-score ${this.data.teams.a.games >= this.data.teams.b.games ? 'leading' : ''}">${this.data.teams.a.games}</div>
+                </div>
+                <div class="team-row">
+                    <div class="team-name"><input id="nameB" value="${this.data.teams.b.name}" /></div>
+                    ${this.data.teams.b.sets.map(s => `<div class="set-score ${s > 0 ? 'won' : ''}">${s || '—'}</div>`).join('')}
+                    <div class="game-score ${this.data.teams.b.games >= this.data.teams.a.games ? 'leading' : ''}">${this.data.teams.b.games}</div>
+                </div>
+                <div class="point-section">
+                    <div class="point-row">
+                        <div class="point-val ${pointA === 'Avantage' ? 'adv-text' : pointA !== '0' ? 'active' : ''}">${pointA}</div>
+                        <div class="point-val ${pointB === 'Avantage' ? 'adv-text' : pointB !== '0' ? 'active' : ''}">${pointB}</div>
+                    </div>
+                </div>
+                <div class="controls">
+                    <button class="btn-score btn-a" id="btnA" ${this.data.finished ? 'disabled' : ''}>+ Point ${this.data.teams.a.name}</button>
+                    <button class="btn-score btn-b" id="btnB" ${this.data.finished ? 'disabled' : ''}>+ Point ${this.data.teams.b.name}</button>
+                </div>
+                <div class="actions">
+                    <button class="btn-sm" id="undoBtn">↩ Annuler</button>
+                    <button class="btn-sm" id="resetBtn">🏠 Accueil</button>
+                </div>
+                <div class="online-users">👥 ${this.data.users.length} joueur(s) connecté(s)</div>
+            </div>
+            </div>
+        `;
+
+        document.getElementById('btnA').onclick = () => this.addPoint('a');
+        document.getElementById('btnB').onclick = () => this.addPoint('b');
+        document.getElementById('undoBtn').onclick = () => this.undo();
+        document.getElementById('resetBtn').onclick = () => this.reset();
+        document.getElementById('nameA').onchange = (e) => { this.data.teams.a.name = e.target.value; this.saveMatch(); };
+        document.getElementById('nameB').onchange = (e) => { this.data.teams.b.name = e.target.value; this.saveMatch(); };
+    }
+}
+
+new PadelApp();
+</script>
+</body>
+</html>
