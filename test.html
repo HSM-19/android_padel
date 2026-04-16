@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Padel Scoreboard</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: #060e1a;
+            min-height: 100vh;
+        }
+
+        /* ───────────── PAGE D'ACCUEIL ───────────── */
+        .home-screen {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #060e1a 0%, #0f2040 100%);
+            padding: 30px 20px;
+        }
+        .home-logo {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+        .home-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: #38bdf8;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .home-subtitle {
+            font-size: 13px;
+            color: #64748b;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 50px;
+        }
+        .home-btn-main {
+            width: 100%;
+            max-width: 320px;
+            padding: 18px;
+            background: #38bdf8;
+            color: #0a1628;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-bottom: 12px;
+            transition: opacity 0.2s;
+        }
+        .home-btn-main:active { opacity: 0.8; }
+        .home-btn-secondary {
+            width: 100%;
+            max-width: 320px;
+            padding: 16px;
+            background: transparent;
+            color: #38bdf8;
+            border: 1px solid rgba(56,189,248,0.3);
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 12px;
+        }
+        .home-divider {
+            color: #334155;
+            font-size: 12px;
+            margin: 8px 0 16px;
+        }
+        .home-input {
+            width: 100%;
+            max-width: 320px;
+            padding: 14px 18px;
+            background: #0f2040;
+            border: 1px solid rgba(56,189,248,0.2);
+            border-radius: 12px;
+            color: white;
+            font-size: 15px;
+            text-align: center;
+            margin-bottom: 10px;
+            outline: none;
+        }
+
+        /* ───────────── PAGE NOUVEAU MATCH ───────────── */
+        .setup-screen {
+            min-height: 100vh;
+            background: linear-gradient(160deg, #a8edca 0%, #b3d4f5 50%, #c9d8f0 100%);
+            padding: 0 0 30px;
+        }
+        .setup-topbar {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            gap: 12px;
+        }
+        .setup-back {
+            background: transparent;
+            border: none;
+            color: #1e3a5f;
+            font-size: 22px;
+            cursor: pointer;
+            padding: 4px 8px;
+        }
+        .setup-topbar-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e3a5f;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .setup-body {
+            padding: 0 20px;
+        }
+        .setup-teams {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .setup-team-card {
+            background: rgba(255,255,255,0.55);
+            border-radius: 18px;
+            padding: 16px 14px;
+            backdrop-filter: blur(8px);
+        }
+        .team-color-badge {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            margin: 0 auto 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: white;
+            letter-spacing: 1px;
+        }
+        .badge-a { background: #7eb6e8; }
+        .badge-b { background: #a8d8cb; }
+        .setup-field {
+            width: 100%;
+            padding: 10px 12px;
+            background: rgba(255,255,255,0.7);
+            border: none;
+            border-radius: 10px;
+            font-size: 12px;
+            color: #1e3a5f;
+            margin-bottom: 8px;
+            outline: none;
+            text-align: center;
+        }
+        .setup-field::placeholder { color: #7a9ab8; }
+        .setup-right-col {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .setup-option-btn {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(255,255,255,0.6);
+            border: none;
+            border-radius: 14px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #1e3a5f;
+            cursor: pointer;
+            text-align: left;
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .setup-option-btn.selected {
+            background: rgba(56,189,248,0.25);
+            border: 1px solid rgba(56,189,248,0.5);
+        }
+        .setup-option-btn select {
+            background: transparent;
+            border: none;
+            font-size: 13px;
+            font-weight: 600;
+            color: #1e3a5f;
+            outline: none;
+            cursor: pointer;
+            width: 100%;
+        }
+        .setup-date-display {
+            font-size: 12px;
+            color: #4a7a9b;
+        }
+        .setup-start-btn {
+            width: 100%;
+            padding: 18px;
+            background: #b0bec5;
+            color: #37474f;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.2s, color 0.2s;
+        }
+        .setup-start-btn.ready {
+            background: #38bdf8;
+            color: #0a1628;
+        }
+
+        /* ───────────── SCOREBOARD VISUEL ───────────── */
+        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;700;800;900&display=swap');
+
+        .scoreboard-screen {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #a8f0d8 0%, #b8d8f5 50%, #c5cff0 100%);
+            display: flex;
+            flex-direction: column;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        /* Top bar */
+        .sb-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px 0;
+        }
+        .sb-topbar-info {
+            font-size: 11px;
+            color: rgba(30,58,95,0.6);
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .sb-undo-btn {
+            background: rgba(255,255,255,0.5);
+            border: none;
+            border-radius: 10px;
+            padding: 7px 14px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #1e3a5f;
+            cursor: pointer;
+        }
+        .sb-home-btn {
+            background: rgba(255,255,255,0.5);
+            border: none;
+            border-radius: 10px;
+            padding: 7px 14px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #1e3a5f;
+            cursor: pointer;
+        }
+
+        /* Status strip */
+        .sb-status {
+            text-align: center;
+            font-size: 12px;
+            font-weight: 800;
+            color: #1e3a5f;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 8px 20px 0;
+        }
+
+        /* Main area: two halves side by side */
+        .sb-field {
+            flex: 1;
+            display: flex;
+            align-items: stretch;
+        }
+
+        /* Each team half */
+        .sb-half {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 8px 20px;
+            position: relative;
+        }
+        .sb-half-a {
+            background: transparent;
+        }
+        .sb-half-b {
+            background: rgba(100,150,230,0.18);
+            border-radius: 0 0 0 0;
+        }
+
+        /* Team name badge (parallelogram) */
+        .sb-team-badge {
+            background: white;
+            padding: 6px 22px 6px 14px;
+            font-size: 13px;
+            font-weight: 900;
+            color: #1e3a5f;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            clip-path: polygon(0 0, 100% 0, 88% 100%, 0 100%);
+            margin-bottom: 6px;
+            min-width: 110px;
+            text-align: left;
+        }
+        .sb-half-b .sb-team-badge {
+            clip-path: polygon(12% 0, 100% 0, 100% 100%, 0 100%);
+            text-align: right;
+            padding: 6px 14px 6px 22px;
+        }
+
+        /* Score diamond / parallelogram */
+        .sb-score-diamond {
+            background: rgba(150,185,230,0.65);
+            width: 130px;
+            height: 110px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            clip-path: polygon(15% 0%, 100% 0%, 85% 100%, 0% 100%);
+            margin: 4px 0 10px;
+        }
+        .sb-score-number {
+            font-family: 'Bebas Neue', 'Arial Black', sans-serif;
+            font-size: 72px;
+            color: #1a2e4a;
+            line-height: 1;
+        }
+
+        /* Plus button */
+        .sb-plus-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-60%);
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: #4a5568;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: #90cdf4;
+            font-weight: 300;
+            transition: background 0.15s, transform 0.1s;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+            z-index: 10;
+        }
+        .sb-plus-btn:active { transform: translateY(-60%) scale(0.92); background: #2d3748; }
+        .sb-half-a .sb-plus-btn { left: 6px; }
+        .sb-half-b .sb-plus-btn { right: 6px; }
+        .sb-plus-btn:disabled { opacity: 0.35; cursor: default; }
+
+        /* Bottom row: SET box + games grid + TB */
+        .sb-bottom {
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            margin-top: 4px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        /* SET counter box */
+        .sb-set-box {
+            background: rgba(200,210,225,0.7);
+            border-radius: 14px;
+            padding: 6px 10px 10px;
+            text-align: center;
+            min-width: 56px;
+        }
+        .sb-set-label {
+            font-size: 10px;
+            font-weight: 900;
+            color: #4a7a9b;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        .sb-set-number {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 36px;
+            color: #1e3a5f;
+            line-height: 1;
+        }
+
+        /* Games grid (3×3 squares) */
+        .sb-games-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 30px);
+            grid-template-rows: repeat(3, 30px);
+            gap: 4px;
+        }
+        .sb-game-sq {
+            background: rgba(255,255,255,0.65);
+            border-radius: 7px;
+            width: 30px;
+            height: 30px;
+            transition: background 0.2s;
+        }
+        .sb-game-sq.won-a { background: #7eb6e8; }
+        .sb-game-sq.won-b { background: #7eb6e8; }
+        .sb-game-sq.tb-sq { background: rgba(255,255,255,0.5); }
+
+        /* TB button */
+        .sb-tb-box {
+            background: rgba(255,255,255,0.65);
+            border-radius: 10px;
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: 900;
+            color: #1e3a5f;
+            letter-spacing: 1px;
+            grid-column: 2;
+            text-align: center;
+            min-width: 40px;
+        }
+        .sb-tb-box.active { background: #f59e0b; color: white; }
+
+        /* Bottom row layout for team B (mirror) */
+        .sb-bottom-b { flex-direction: row-reverse; }
+
+        /* Winner overlay */
+        .sb-winner-banner {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+        .sb-winner-card {
+            background: linear-gradient(135deg, #a8edca, #b3d4f5);
+            border-radius: 24px;
+            padding: 40px 32px;
+            text-align: center;
+            max-width: 300px;
+            width: 90%;
+        }
+        .sb-winner-title {
+            font-size: 13px;
+            font-weight: 900;
+            color: #4a7a9b;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+        .sb-winner-name {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 48px;
+            color: #1e3a5f;
+            margin-bottom: 4px;
+        }
+        .sb-winner-sub {
+            font-size: 13px;
+            color: #4a7a9b;
+            margin-bottom: 24px;
+        }
+        .sb-winner-btn {
+            width: 100%;
+            padding: 14px;
+            background: #38bdf8;
+            border: none;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 800;
+            color: #0a1628;
+            cursor: pointer;
+        }
+
+        /* ───────────── MODAL TYPE DE MATCH ───────────── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 100;
+            align-items: flex-end;
+            justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-sheet {
+            background: linear-gradient(160deg, #a8edca 0%, #b3d4f5 100%);
+            border-radius: 24px 24px 0 0;
+            padding: 24px 20px 40px;
+            width: 100%;
+            max-width: 480px;
+        }
+        .modal-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e3a5f;
+            text-align: center;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .modal-option {
+            width: 100%;
+            padding: 16px;
+            background: rgba(255,255,255,0.6);
+            border: none;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1e3a5f;
+            cursor: pointer;
+            margin-bottom: 10px;
+            text-align: left;
+        }
+        .modal-option.selected {
+            background: rgba(56,189,248,0.3);
+            border: 1px solid #38bdf8;
+        }
+        .modal-close {
+            width: 100%;
+            padding: 14px;
+            background: transparent;
+            border: 1px solid rgba(30,58,95,0.3);
+            border-radius: 14px;
+            font-size: 14px;
+            color: #1e3a5f;
+            cursor: pointer;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+class PadelApp {
+    constructor() {
+        this.matchId = null;
+        this.data = null;
+        this.channel = null;
+        this.setupConfig = {
+            teamA: { name: '', player1: '', player2: '' },
+            teamB: { name: '', player1: '', player2: '' },
+            matchType: '',
+            terrain: '',
+            date: this.getTodayStr()
+        };
+        this.init();
+    }
+
+    getTodayStr() {
+        const d = new Date();
+        return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    }
+
+    init() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const matchId = urlParams.get('match');
+        if (matchId) {
+            this.joinMatch(matchId);
+        } else {
+            this.showHome();
+        }
+        this.channel = new BroadcastChannel('padel_sync');
+        this.channel.onmessage = (event) => {
+            if (event.data.matchId === this.matchId && event.data.type === 'update') {
+                this.data = event.data.data;
+                this.renderScore();
+            }
+        };
+    }
+
+    // ─── PAGE D'ACCUEIL ───
+    showHome() {
+        document.getElementById('app').innerHTML = `
+            <div class="home-screen">
+                <div class="home-logo">🏓</div>
+                <div class="home-title">Padel Score</div>
+                <div class="home-subtitle">Scoreboard officiel</div>
+                <button class="home-btn-main" id="newMatchBtn">🎾 Nouveau Match</button>
+                <div class="home-divider">— ou rejoindre —</div>
+                <input class="home-input" type="text" id="joinInput" placeholder="ID du match" />
+                <button class="home-btn-secondary" id="joinBtn">Rejoindre un match</button>
+            </div>
+        `;
+        document.getElementById('newMatchBtn').onclick = () => this.showSetup();
+        document.getElementById('joinBtn').onclick = () => {
+            const id = document.getElementById('joinInput').value.trim();
+            if (id) this.joinMatch(id);
+        };
+    }
+
+    // ─── PAGE CONFIGURATION ───
+    showSetup() {
+        const cfg = this.setupConfig;
+        document.getElementById('app').innerHTML = `
+            <div class="setup-screen">
+                <div class="setup-topbar">
+                    <button class="setup-back" id="backBtn">←</button>
+                    <span class="setup-topbar-title">Nouveau Match</span>
+                </div>
+                <div class="setup-body">
+                    <div class="setup-teams">
+                        <!-- EQUIPE A -->
+                        <div class="setup-team-card">
+                            <div class="team-color-badge badge-a">EQUIPE A</div>
+                            <input class="setup-field" id="teamAName" placeholder="......NOM D'EQUIPE......" value="${cfg.teamA.name}" />
+                            <input class="setup-field" id="playerA1" placeholder="......NOM JOUEUR 1......" value="${cfg.teamA.player1}" />
+                            <input class="setup-field" id="playerA2" placeholder="......NOM JOUEUR 2......" value="${cfg.teamA.player2}" />
+                        </div>
+                        <!-- EQUIPE B -->
+                        <div class="setup-team-card">
+                            <div class="team-color-badge badge-b">EQUIPE B</div>
+                            <input class="setup-field" id="teamBName" placeholder="......NOM D'EQUIPE......" value="${cfg.teamB.name}" />
+                            <input class="setup-field" id="playerB1" placeholder="......NOM JOUEUR 1......" value="${cfg.teamB.player1}" />
+                            <input class="setup-field" id="playerB2" placeholder="......NOM JOUEUR 2......" value="${cfg.teamB.player2}" />
+                        </div>
+                    </div>
+
+                    <div class="setup-right-col">
+                        <button class="setup-option-btn ${cfg.matchType ? 'selected' : ''}" id="matchTypeBtn">
+                            <span>${cfg.matchType || '> TYPE DE MATCH (AMICAL - ENTRAINEMENT)'}</span>
+                            <span>›</span>
+                        </button>
+                        <div class="setup-option-btn">
+                            <select id="terrainSelect">
+                                <option value="" disabled ${!cfg.terrain ? 'selected' : ''}>› TERRAIN (1 - 2 - 3 - 4)</option>
+                                <option value="1" ${cfg.terrain === '1' ? 'selected' : ''}>Terrain 1</option>
+                                <option value="2" ${cfg.terrain === '2' ? 'selected' : ''}>Terrain 2</option>
+                                <option value="3" ${cfg.terrain === '3' ? 'selected' : ''}>Terrain 3</option>
+                                <option value="4" ${cfg.terrain === '4' ? 'selected' : ''}>Terrain 4</option>
+                            </select>
+                        </div>
+                        <div class="setup-option-btn">
+                            <span>DATE</span>
+                            <span class="setup-date-display">${cfg.date}</span>
+                        </div>
+                    </div>
+
+                    <button class="setup-start-btn ${this.isSetupReady() ? 'ready' : ''}" id="startBtn">START</button>
+                </div>
+            </div>
+
+            <!-- Modal type de match -->
+            <div class="modal-overlay" id="matchTypeModal">
+                <div class="modal-sheet">
+                    <div class="modal-title">Type de match</div>
+                    <button class="modal-option ${cfg.matchType === 'Amical' ? 'selected' : ''}" data-type="Amical">🤝 Amical</button>
+                    <button class="modal-option ${cfg.matchType === 'Entraînement' ? 'selected' : ''}" data-type="Entraînement">🏋️ Entraînement</button>
+                    <button class="modal-option ${cfg.matchType === 'Compétition' ? 'selected' : ''}" data-type="Compétition">🏆 Compétition</button>
+                    <button class="modal-close" id="modalClose">Annuler</button>
+                </div>
+            </div>
+        `;
+
+        // Sauvegarde des champs en temps réel
+        ['teamAName','playerA1','playerA2','teamBName','playerB1','playerB2'].forEach(id => {
+            document.getElementById(id).oninput = () => this.updateSetupConfig();
+        });
+        document.getElementById('terrainSelect').onchange = () => this.updateSetupConfig();
+
+        document.getElementById('backBtn').onclick = () => this.showHome();
+        document.getElementById('startBtn').onclick = () => this.startMatch();
+        document.getElementById('matchTypeBtn').onclick = () => {
+            document.getElementById('matchTypeModal').classList.add('open');
+        };
+        document.getElementById('modalClose').onclick = () => {
+            document.getElementById('matchTypeModal').classList.remove('open');
+        };
+        document.querySelectorAll('.modal-option').forEach(btn => {
+            btn.onclick = () => {
+                this.setupConfig.matchType = btn.dataset.type;
+                document.getElementById('matchTypeModal').classList.remove('open');
+                this.showSetup();
+            };
+        });
+    }
+
+    updateSetupConfig() {
+        this.setupConfig.teamA.name    = document.getElementById('teamAName').value;
+        this.setupConfig.teamA.player1 = document.getElementById('playerA1').value;
+        this.setupConfig.teamA.player2 = document.getElementById('playerA2').value;
+        this.setupConfig.teamB.name    = document.getElementById('teamBName').value;
+        this.setupConfig.teamB.player1 = document.getElementById('playerB1').value;
+        this.setupConfig.teamB.player2 = document.getElementById('playerB2').value;
+        this.setupConfig.terrain       = document.getElementById('terrainSelect').value;
+
+        const btn = document.getElementById('startBtn');
+        if (btn) {
+            btn.className = 'setup-start-btn' + (this.isSetupReady() ? ' ready' : '');
+        }
+    }
+
+    isSetupReady() {
+        const c = this.setupConfig;
+        return c.teamA.name.trim() && c.teamB.name.trim();
+    }
+
+    startMatch() {
+        this.updateSetupConfig();
+        if (!this.isSetupReady()) {
+            alert('Veuillez entrer au moins le nom des deux équipes.');
+            return;
+        }
+        this.matchId = 'M' + Math.random().toString(36).substr(2, 8).toUpperCase();
+        this.data = this.getInitialData();
+        this.saveMatch();
+        this.updateUrl();
+        this.renderScore();
+        this.startSync();
+    }
+
+    // ─── MATCH EN COURS ───
+    joinMatch(matchId) {
+        const saved = localStorage.getItem(`match_${matchId}`);
+        if (saved) {
+            this.matchId = matchId;
+            this.data = JSON.parse(saved);
+            this.updateUrl();
+            this.renderScore();
+            this.startSync();
+        } else {
+            alert('Match non trouvé. Créez-en un nouveau !');
+            this.showHome();
+        }
+    }
+
+    getInitialData() {
+        const cfg = this.setupConfig;
+        return {
+            teams: {
+                a: { name: cfg.teamA.name || 'Équipe A', player1: cfg.teamA.player1, player2: cfg.teamA.player2, sets: [null,null,null], games: 0, points: 0 },
+                b: { name: cfg.teamB.name || 'Équipe B', player1: cfg.teamB.player1, player2: cfg.teamB.player2, sets: [null,null,null], games: 0, points: 0 }
+            },
+            matchType: cfg.matchType,
+            terrain: cfg.terrain,
+            date: cfg.date,
+            currentSet: 0,
+            finished: false,
+            history: [],
+            lastUpdate: Date.now(),
+            startTime: Date.now(),
+            server: 'a',
+            totalGamesPlayed: 0,
+            users: [this.getUserId()]
+        };
+    }
+
+    getUserId() {
+        let id = localStorage.getItem('padel_user_id');
+        if (!id) {
+            id = 'User_' + Math.random().toString(36).substr(2, 6);
+            localStorage.setItem('padel_user_id', id);
+        }
+        return id;
+    }
+
+    saveMatch() {
+        localStorage.setItem(`match_${this.matchId}`, JSON.stringify(this.data));
+        this.channel.postMessage({ type: 'update', matchId: this.matchId, data: this.data });
+    }
+
+    updateUrl() {
+        const url = new URL(window.location);
+        url.searchParams.set('match', this.matchId);
+        window.history.pushState({}, '', url);
+    }
+
+    startSync() {
+        setInterval(() => {
+            if (this.data && !this.data.finished) {
+                const userId = this.getUserId();
+                if (!this.data.users.includes(userId)) {
+                    this.data.users.push(userId);
+                    this.saveMatch();
+                    this.renderScore();
+                }
+            }
+        }, 5000);
+    }
+
+    addPoint(team) {
+        if (this.data.finished) return;
+        const snapshot = JSON.parse(JSON.stringify({ ...this.data, history: [] }));
+        this.data.history.push(snapshot);
+        this.data.teams[team].points++;
+        this.checkGame();
+        this.data.lastUpdate = Date.now();
+        this.saveMatch();
+        this.renderScore();
+    }
+
+    // ──────────────────────────────────────────────
+    // RÈGLES PADEL
+    // Sets 1 & 2 : jeux 0-6, 6-6 = tiebreak (1er à 7 pts, écart 2)
+    //              si 5-5 on peut aller à 7 jeux
+    // Set 3      : super tiebreak dès le début (1er à 10 pts, écart 2)
+    // Match      : 2 sets gagnants
+    // ──────────────────────────────────────────────
+
+    isTiebreakActive() {
+        if (this.data.currentSet === 2) return true;  // 3ème set = super TB
+        const { a, b } = this.data.teams;
+        return a.games === 6 && b.games === 6;         // 6-6 dans set 1 ou 2
+    }
+
+    checkGame() {
+        const { a, b } = this.data.teams;
+        const isTB = this.isTiebreakActive();
+        let gameWinner = null;
+
+        if (isTB) {
+            const target = this.data.currentSet === 2 ? 10 : 7;
+            if (a.points >= target && a.points - b.points >= 2) gameWinner = 'a';
+            else if (b.points >= target && b.points - a.points >= 2) gameWinner = 'b';
+        } else {
+            // Tennis / padel standard : 0 15 30 40, avantage
+            if (a.points >= 3 && b.points >= 3) {
+                // Deuce
+                if (a.points - b.points >= 2) gameWinner = 'a';
+                else if (b.points - a.points >= 2) gameWinner = 'b';
+            } else {
+                if (a.points >= 4) gameWinner = 'a';
+                else if (b.points >= 4) gameWinner = 'b';
+            }
+        }
+
+        if (gameWinner) {
+            a.points = 0;
+            b.points = 0;
+            this.data.totalGamesPlayed++;
+
+            if (isTB) {
+                // Tiebreak terminé → set gagné
+                const si = this.data.currentSet;
+                // Pour le TB on stocke le score TB dans sets (ex: 7 ou 10)
+                a.sets[si] = this.data.currentSet === 2 ? (gameWinner === 'a' ? 10 : b.points) : (gameWinner === 'a' ? 7 : b.points);
+                b.sets[si] = this.data.currentSet === 2 ? (gameWinner === 'b' ? 10 : a.points) : (gameWinner === 'b' ? 7 : a.points);
+                // Corrige : on avait déjà remis points à 0, on stocke les bons scores TB
+                // On recalcule depuis snapshot (points annulés), donc on fixe manuellement
+                if (this.data.currentSet < 2) {
+                    a.sets[si] = gameWinner === 'a' ? '7' : '6';
+                    b.sets[si] = gameWinner === 'b' ? '7' : '6';
+                } else {
+                    a.sets[si] = gameWinner === 'a' ? '10' : '-';
+                    b.sets[si] = gameWinner === 'b' ? '10' : '-';
+                }
+                a.games = 0;
+                b.games = 0;
+                this.data.currentSet++;
+                // Changement de service après TB
+                this.data.server = this.data.server === 'a' ? 'b' : 'a';
+            } else {
+                // Jeu normal gagné
+                this.data.teams[gameWinner].games++;
+                // Service change à chaque jeu
+                this.data.server = this.data.server === 'a' ? 'b' : 'a';
+                this.checkSet();
+            }
+
+            // Vérifie si le match est fini
+            const sA = a.sets.filter((s,i) => s !== null && this._setWon(i,'a')).length;
+            const sB = b.sets.filter((s,i) => s !== null && this._setWon(i,'b')).length;
+            if (sA === 2 || sB === 2) this.data.finished = true;
+        }
+    }
+
+    _setWon(idx, team) {
+        const a = this.data.teams.a.sets[idx];
+        const b = this.data.teams.b.sets[idx];
+        if (a === null || b === null) return false;
+        const aNum = parseInt(a) || 0;
+        const bNum = parseInt(b) || 0;
+        return team === 'a' ? aNum > bNum : bNum > aNum;
+    }
+
+    checkSet() {
+        const { a, b } = this.data.teams;
+        if (this.data.currentSet >= 2) return;
+        let setWinner = null;
+        const ag = a.games, bg = b.games;
+
+        // Victoire normale : 6 jeux avec 2 d'écart, ou 7 jeux (après 5-5)
+        if (ag >= 6 && ag - bg >= 2) setWinner = 'a';
+        else if (bg >= 6 && bg - ag >= 2) setWinner = 'b';
+        else if (ag === 7 && bg <= 5) setWinner = 'a';
+        else if (bg === 7 && ag <= 5) setWinner = 'b';
+        // 6-6 → tiebreak géré dans checkGame directement (isTiebreakActive)
+
+        if (setWinner) {
+            const si = this.data.currentSet;
+            a.sets[si] = ag;
+            b.sets[si] = bg;
+            a.games = 0;
+            b.games = 0;
+            this.data.currentSet++;
+        }
+    }
+
+    undo() {
+        if (this.data.history.length === 0) return;
+        const previousHistory = [...this.data.history];
+        this.data = this.data.history[this.data.history.length - 1];
+        previousHistory.pop();
+        this.data.history = previousHistory;
+        this.saveMatch();
+        this.renderScore();
+    }
+
+    reset() {
+        if (confirm('Retourner à l accueil ?')) {
+            clearInterval(this._timerInterval);
+            window.history.pushState({}, '', window.location.pathname);
+            this.matchId = null;
+            this.data = null;
+            this.showHome();
+        }
+    }
+
+    getPointDisplay(points, opponentPoints) {
+        if (this.isTiebreakActive()) return points;
+        const labels = ['0', '15', '30', '40'];
+        const deuce = points >= 3 && opponentPoints >= 3;
+        if (deuce) {
+            if (points > opponentPoints) return 'Avt';
+            if (points === opponentPoints) return '=';
+        }
+        return labels[Math.min(points, 3)];
+    }
+
+    startTimer() {
+        clearInterval(this._timerInterval);
+        this._timerInterval = setInterval(() => {
+            const el = document.getElementById('sb-timer');
+            if (el && this.data && !this.data.finished) {
+                const elapsed = Math.floor((Date.now() - this.data.startTime) / 1000);
+                const m = Math.floor(elapsed / 60).toString().padStart(2,'0');
+                const s = (elapsed % 60).toString().padStart(2,'0');
+                el.textContent = m + ':' + s;
+            }
+        }, 1000);
+    }
+
+    renderScore() {
+        const { a, b } = this.data.teams;
+        const isTB = this.isTiebreakActive();
+        const pointA = this.getPointDisplay(a.points, b.points);
+        const pointB = this.getPointDisplay(b.points, a.points);
+
+        // Compte les sets gagnés
+        const setsWonA = [0,1,2].filter(i => this._setWon(i,'a')).length;
+        const setsWonB = [0,1,2].filter(i => this._setWon(i,'b')).length;
+
+        const server = this.data.server;
+
+        // Chrono initial
+        const elapsed = Math.floor((Date.now() - this.data.startTime) / 1000);
+        const m = Math.floor(elapsed / 60).toString().padStart(2,'0');
+        const s = (elapsed % 60).toString().padStart(2,'0');
+        const timerStr = m + ':' + s;
+
+        // Sets history display
+        const setDisplay = (team) => {
+            let html = '';
+            for (let i = 0; i < 3; i++) {
+                const val = this.data.teams[team].sets[i];
+                const won = this._setWon(i, team);
+                if (val !== null) {
+                    html += `<span style="font-size:11px;font-weight:900;color:${won ? '#1e3a5f' : '#8aabcc'};background:${won ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.3)'};border-radius:6px;padding:2px 6px;margin:0 2px;">${val}</span>`;
+                }
+            }
+            return html || '';
+        };
+
+        // Carreaux jeux (grille 3x3 = 9 cases, cases 1-7 pour jeux normaux)
+        const buildSquares = (teamGames) => {
+            let sq = '';
+            for (let i = 0; i < 9; i++) {
+                if (i === 8 && isTB) {
+                    sq += `<div class="sb-game-sq" style="background:rgba(245,158,11,0.85);display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:900;color:white;">TB</div>`;
+                } else {
+                    sq += `<div class="sb-game-sq ${i < teamGames ? 'won-a' : ''}"></div>`;
+                }
+            }
+            return sq;
+        };
+
+        const infoText = [this.data.matchType, this.data.terrain ? 'Terrain ' + this.data.terrain : '', this.data.date].filter(Boolean).join(' · ');
+        const setLabel = this.data.currentSet === 2 ? 'SUPER TB' : (isTB ? 'TIE-BREAK' : 'SET ' + (this.data.currentSet + 1));
+        const statusText = this.data.finished
+            ? '🏆 ' + (setsWonA > setsWonB ? a.name : b.name) + ' GAGNE !'
+            : setLabel + '  ·  ' + setsWonA + ' – ' + setsWonB;
+
+        const winnerHTML = this.data.finished ? `
+            <div class="sb-winner-banner" id="winnerBanner">
+                <div class="sb-winner-card">
+                    <div class="sb-winner-title">🏆 Vainqueur</div>
+                    <div class="sb-winner-name">${setsWonA > setsWonB ? a.name : b.name}</div>
+                    <div class="sb-winner-sub">Match terminé · ${setsWonA} – ${setsWonB}</div>
+                    <button class="sb-winner-btn" id="homeFromWinner">Retour à l'accueil</button>
+                </div>
+            </div>` : '';
+
+        document.getElementById('app').innerHTML = `
+            <div class="scoreboard-screen">
+                <div class="sb-topbar">
+                    <button class="sb-home-btn" id="resetBtn">🏠</button>
+                    <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
+                        <div id="sb-timer" style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#1e3a5f;letter-spacing:2px;">${timerStr}</div>
+                        <div class="sb-topbar-info">${infoText}</div>
+                    </div>
+                    <button class="sb-undo-btn" id="undoBtn">↩</button>
+                </div>
+
+                <div class="sb-status">${statusText}</div>
+
+                <div class="sb-field">
+                    <!-- EQUIPE A -->
+                    <div class="sb-half sb-half-a">
+                        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                            ${server === 'a' ? '<span style="font-size:16px;" title="Au service">🎾</span>' : '<span style="font-size:16px;opacity:0;">🎾</span>'}
+                            <div class="sb-team-badge">${a.name}</div>
+                        </div>
+                        <div style="min-height:18px;margin-bottom:2px;">${setDisplay('a')}</div>
+                        <div class="sb-score-diamond">
+                            <span class="sb-score-number">${isTB ? pointA : a.games}</span>
+                        </div>
+                        <button class="sb-plus-btn" id="btnA" ${this.data.finished ? 'disabled' : ''}>+</button>
+
+                        <div class="sb-bottom">
+                            <div class="sb-set-box">
+                                <div class="sb-set-label">SET</div>
+                                <div class="sb-set-number">${setsWonA}</div>
+                            </div>
+                            <div>
+                                <div class="sb-games-grid">${buildSquares(isTB ? 6 : a.games)}</div>
+                                <div style="text-align:center;margin-top:4px;">
+                                    <span class="sb-tb-box ${isTB ? 'active' : ''}">TB</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- EQUIPE B -->
+                    <div class="sb-half sb-half-b">
+                        <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-bottom:4px;">
+                            <div class="sb-team-badge">${b.name}</div>
+                            ${server === 'b' ? '<span style="font-size:16px;" title="Au service">🎾</span>' : '<span style="font-size:16px;opacity:0;">🎾</span>'}
+                        </div>
+                        <div style="min-height:18px;margin-bottom:2px;text-align:right;">${setDisplay('b')}</div>
+                        <div class="sb-score-diamond">
+                            <span class="sb-score-number">${isTB ? pointB : b.games}</span>
+                        </div>
+                        <button class="sb-plus-btn" id="btnB" ${this.data.finished ? 'disabled' : ''}>+</button>
+
+                        <div class="sb-bottom sb-bottom-b">
+                            <div class="sb-set-box">
+                                <div class="sb-set-label">SET</div>
+                                <div class="sb-set-number">${setsWonB}</div>
+                            </div>
+                            <div>
+                                <div class="sb-games-grid">${buildSquares(isTB ? 6 : b.games)}</div>
+                                <div style="text-align:center;margin-top:4px;">
+                                    <span class="sb-tb-box ${isTB ? 'active' : ''}">TB</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Points -->
+                <div style="display:flex;align-items:stretch;background:rgba(255,255,255,0.25);">
+                    <div style="flex:1;text-align:center;padding:10px 0 8px;border-right:1px solid rgba(255,255,255,0.4);">
+                        <div style="font-size:9px;font-weight:900;letter-spacing:2px;color:#4a7a9b;text-transform:uppercase;margin-bottom:2px;">${isTB ? 'Points TB' : 'Points'}</div>
+                        <div style="font-family:'Bebas Neue',sans-serif;font-size:40px;color:#1e3a5f;line-height:1;">${pointA}</div>
+                    </div>
+                    <div style="flex:1;text-align:center;padding:10px 0 8px;">
+                        <div style="font-size:9px;font-weight:900;letter-spacing:2px;color:#4a7a9b;text-transform:uppercase;margin-bottom:2px;">${isTB ? 'Points TB' : 'Points'}</div>
+                        <div style="font-family:'Bebas Neue',sans-serif;font-size:40px;color:#1e3a5f;line-height:1;">${pointB}</div>
+                    </div>
+                </div>
+
+                <!-- Changer service manuellement -->
+                <div style="text-align:center;padding:6px 0 10px;background:rgba(255,255,255,0.1);">
+                    <button id="switchServer" style="background:rgba(255,255,255,0.45);border:none;border-radius:10px;padding:6px 18px;font-size:11px;font-weight:800;color:#1e3a5f;cursor:pointer;letter-spacing:1px;">
+                        🔄 Changer le service
+                    </button>
+                </div>
+
+                ${winnerHTML}
+            </div>
+        `;
+
+        document.getElementById('btnA').onclick = () => this.addPoint('a');
+        document.getElementById('btnB').onclick = () => this.addPoint('b');
+        document.getElementById('undoBtn').onclick = () => this.undo();
+        document.getElementById('resetBtn').onclick = () => this.reset();
+        document.getElementById('switchServer').onclick = () => {
+            this.data.server = this.data.server === 'a' ? 'b' : 'a';
+            this.saveMatch();
+            this.renderScore();
+        };
+        if (document.getElementById('homeFromWinner')) {
+            document.getElementById('homeFromWinner').onclick = () => this.reset();
+        }
+        this.startTimer();
+    }
+}
+
+new PadelApp();
+</script>
+</body>
+</html>
